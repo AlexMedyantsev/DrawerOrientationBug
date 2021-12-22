@@ -3,27 +3,28 @@ import {Text, View} from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import Orientation, { useDeviceOrientationChange } from 'react-native-orientation-locker';
+import {useOrientation} from "./hooks/useOrientation";
 
 const RootStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
-function HomeScreen() {
+export function App() {
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Screen</Text>
-    </View>
-  )
+    <NavigationContainer>
+      <RootStack.Navigator
+        initialRouteName="DrawerNavigatorStack"
+        screenOptions={{
+          headerShown: false
+        }}
+      >
+        <RootStack.Screen name="DrawerNavigatorStack" component={DrawerNavigatorStack} />
+      </RootStack.Navigator>
+    </NavigationContainer>
+  );
 }
 
 function DrawerNavigatorStack({ route }) {
-  const [currentOrientation, setOrientation] = useState(Orientation.getInitialOrientation());
-
-  useDeviceOrientationChange(() => {
-    Orientation.getOrientation((orientation) => {
-      setOrientation(orientation);
-    });
-  });
+  const Orientation = useOrientation()
 
   return (
     <Drawer.Navigator
@@ -35,7 +36,7 @@ function DrawerNavigatorStack({ route }) {
           borderRightWidth: 1,
           borderRightColor: 'gray',
         },
-        drawerType: currentOrientation === 'PORTRAIT' ? 'front' : 'permanent',
+        drawerType: Orientation === 'PORTRAIT' ? 'front' : 'permanent',
         gestureEnabled: true,
         headerShown: true
       }}
@@ -49,19 +50,10 @@ function DrawerNavigatorStack({ route }) {
   );
 }
 
-export function App() {
+function HomeScreen() {
   return (
-    <NavigationContainer>
-
-    <RootStack.Navigator
-      initialRouteName="DrawerNavigatorStack"
-      screenOptions={{
-        headerShown: false
-      }}
-    >
-      <RootStack.Screen name="DrawerNavigatorStack" component={DrawerNavigatorStack} />
-    </RootStack.Navigator>
-    </NavigationContainer>
-
-  );
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Screen</Text>
+    </View>
+  )
 }
